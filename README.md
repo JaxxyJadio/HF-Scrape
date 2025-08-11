@@ -30,12 +30,12 @@ python hf_scrape_to_input_jsonl.py \
   --streaming \
   --out /data/c4_en_input.jsonl \
   --limit 100000
+HF DATASET SCRAPER → "input"-ONLY JSONL
 
+This script downloads a dataset from Hugging Face Datasets, extracts or builds a single "input" text field for each row, cleans it, and writes it to a .jsonl file with only the "input" key.
 
-HF Dataset Scraper → input-only JSONL
-This script downloads a dataset from Hugging Face Datasets, extracts or builds a single "input" text field for each row, cleans it, and writes it to a .jsonl file (JSON Lines format) with only the "input" key.
+WHAT THIS SCRIPT DOES
 
-1. What this script does
 Connects to Hugging Face and downloads the dataset split you choose.
 
 Picks one or more columns from the dataset to build a single "input" string.
@@ -44,138 +44,75 @@ Optionally combines multiple columns (e.g., instruction + input → one text blo
 
 Cleans the text (strip whitespace, remove duplicates, length filtering).
 
-Writes each row to a .jsonl file:
-
-json
-Copy
-Edit
+Writes each row to a .jsonl file in the form:
 {"input": "your text here"}
 {"input": "next row text here"}
-Nothing else. No labels, no metadata, just "input".
 
-2. What you need installed
-Run these in your terminal:
+REQUIREMENTS
 
-bash
-Copy
-Edit
+Run in terminal:
 pip install datasets
-If you want to download private datasets, also run:
 
-bash
-Copy
-Edit
+For private datasets:
 pip install huggingface_hub
 huggingface-cli login
-3. Script usage
-Save the Python script from above as hf_scrape_to_input_jsonl.py.
 
-Run it like this:
+BASIC USAGE
 
-bash
-Copy
-Edit
-python hf_scrape_to_input_jsonl.py \
-  --dataset <dataset_name> \
-  --split <split_name> \
-  --out <output_path.jsonl>
-Basic example:
+Save the script as hf_scrape_to_input_jsonl.py
 
-bash
-Copy
-Edit
-python hf_scrape_to_input_jsonl.py \
-  --dataset openwebtext \
-  --split train \
-  --out ./openwebtext_input.jsonl
-4. Common options explained
-Option	What it does	Example
---dataset	The Hugging Face dataset repo name.	openwebtext, tatsu-lab/alpaca
---split	Which split to use.	train, validation, test
---config	If the dataset has multiple configs.	--config en for C4 English
---cols	Comma-separated list of text columns to merge.	--cols instruction,input
---sep	Separator when joining columns.	--sep "\n\n"
---template	Build the "input" using a Python format string.	--template "{instruction}\n{input}\n{output}"
---min_chars	Skip rows shorter than this many characters.	--min_chars 30
---max_chars	Skip rows longer than this many characters.	--max_chars 2000
---lower	Lowercase text before filtering/deduplication.	--lower
---dedup	Remove duplicate "input" values.	--dedup
---limit	Stop after this many rows.	--limit 50000
---streaming	Stream the dataset without full download (for huge datasets).	--streaming
---trust_remote_code	Needed if the dataset loader has custom Python code.	--trust_remote_code
---out	Output .jsonl file path.	--out ./data.jsonl
-
-5. Example scenarios
-A) Simple "text" column dataset
-
-bash
-Copy
-Edit
-python hf_scrape_to_input_jsonl.py \
-  --dataset openwebtext \
-  --split train \
-  --out ./openwebtext_input.jsonl \
-  --limit 100000
-B) Alpaca dataset (merge instruction and input)
-
-bash
-Copy
-Edit
-python hf_scrape_to_input_jsonl.py \
-  --dataset tatsu-lab/alpaca \
-  --split train \
-  --cols instruction,input \
-  --sep "\n\n" \
-  --out ./alpaca_input.jsonl \
-  --dedup
-C) Template formatting
-
-bash
-Copy
-Edit
-python hf_scrape_to_input_jsonl.py \
-  --dataset databricks/databricks-dolly-15k \
-  --split train \
-  --template "{instruction}\n\n{context}\n\n{response}" \
-  --out ./dolly_input.jsonl \
-  --min_chars 50
-D) Streaming a massive dataset
-
-bash
-Copy
-Edit
-python hf_scrape_to_input_jsonl.py \
-  --dataset c4 \
-  --config en \
-  --split train \
-  --streaming \
-  --out ./c4_en_input.jsonl \
-  --limit 200000
-6. Output format
-The output file is in JSON Lines format, which means:
-
-One JSON object per line.
-
-Each object has exactly one key: "input".
+Run:
+python hf_scrape_to_input_jsonl.py --dataset <dataset_name> --split <split_name> --out <output_path.jsonl>
 
 Example:
+python hf_scrape_to_input_jsonl.py --dataset openwebtext --split train --out ./openwebtext_input.jsonl
 
-json
-Copy
-Edit
+COMMON OPTIONS
+
+--dataset : Hugging Face dataset repo name (e.g., openwebtext, tatsu-lab/alpaca)
+--split : Dataset split (e.g., train, validation, test)
+--config : Config name if needed (e.g., --config en for c4 English)
+--cols : Comma-separated list of columns to merge (e.g., instruction,input)
+--sep : Separator for merged columns (e.g., "\n\n")
+--template : Build input using Python format string (e.g., "{instruction}\n{input}\n{output}")
+--min_chars : Minimum characters to keep a row (default 1)
+--max_chars : Maximum characters allowed (default 200000)
+--lower : Lowercase before filtering/deduplication
+--dedup : Remove duplicate "input" values
+--limit : Stop after N rows
+--streaming : Stream dataset without downloading fully
+--trust_remote_code : Allow custom dataset loader code
+--out : Output JSONL file path
+
+EXAMPLE COMMANDS
+
+A) Simple text column dataset:
+python hf_scrape_to_input_jsonl.py --dataset openwebtext --split train --out ./openwebtext_input.jsonl --limit 100000
+
+B) Alpaca dataset (merge instruction and input):
+python hf_scrape_to_input_jsonl.py --dataset tatsu-lab/alpaca --split train --cols instruction,input --sep "\n\n" --out ./alpaca_input.jsonl --dedup
+
+C) Template formatting:
+python hf_scrape_to_input_jsonl.py --dataset databricks/databricks-dolly-15k --split train --template "{instruction}\n\n{context}\n\n{response}" --out ./dolly_input.jsonl --min_chars 50
+
+D) Streaming a massive dataset:
+python hf_scrape_to_input_jsonl.py --dataset c4 --config en --split train --streaming --out ./c4_en_input.jsonl --limit 200000
+
+OUTPUT FORMAT
+
+Output is JSON Lines format:
 {"input": "The quick brown fox jumps over the lazy dog."}
 {"input": "Artificial intelligence is transforming the world."}
-7. Pro tips
+
+PRO TIPS
+
 Use --dedup for cleaner data.
 
-Use --streaming for large datasets like c4 to avoid full download.
+Use --streaming for large datasets to avoid full download.
 
-If unsure which columns are available, run:
-
-python
-Copy
-Edit
+To see available columns:
 from datasets import load_dataset
 ds = load_dataset("your_dataset", split="train")
 print(ds.column_names)
-Keep --min_chars > 20 for better quality text.
+
+Set --min_chars > 20 for better quality.
