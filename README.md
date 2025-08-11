@@ -70,18 +70,31 @@ python hf_scrape_to_input_jsonl.py --dataset openwebtext --split train --out ./o
 COMMON OPTIONS
 
 --dataset : Hugging Face dataset repo name (e.g., openwebtext, tatsu-lab/alpaca)
+
 --split : Dataset split (e.g., train, validation, test)
+
 --config : Config name if needed (e.g., --config en for c4 English)
+
 --cols : Comma-separated list of columns to merge (e.g., instruction,input)
+
 --sep : Separator for merged columns (e.g., "\n\n")
+
 --template : Build input using Python format string (e.g., "{instruction}\n{input}\n{output}")
+
 --min_chars : Minimum characters to keep a row (default 1)
+
 --max_chars : Maximum characters allowed (default 200000)
+
 --lower : Lowercase before filtering/deduplication
+
 --dedup : Remove duplicate "input" values
+
 --limit : Stop after N rows
+
 --streaming : Stream dataset without downloading fully
+
 --trust_remote_code : Allow custom dataset loader code
+
 --out : Output JSONL file path
 
 EXAMPLE COMMANDS
